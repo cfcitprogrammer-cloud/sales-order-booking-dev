@@ -76,11 +76,11 @@ export default function ChooseProduct() {
 
           return (
             <div key={product.uid} className="p-2 border rounded">
-              <iframe
+              {/* <iframe
                 src={`https://drive.google.com/file/d/${product.id}/preview`}
                 className="w-full"
                 allow="autoplay"
-              ></iframe>
+              ></iframe> */}
 
               <h1 className="font-semibold mt-2">{product.item}</h1>
 
