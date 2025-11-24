@@ -8,6 +8,7 @@ const useCustomerStore = create((set) => ({
     contactPerson: "",
     deliveryDate: "",
     remarks: "",
+    attachment: null, // NEW
   },
 
   setCustomerInfo: (key, value) =>
@@ -18,7 +19,6 @@ const useCustomerStore = create((set) => ({
       },
     })),
 
-  // Add a function to clear/reset customer info
   clearCustomerInfo: () =>
     set({
       customerInfo: {
@@ -28,6 +28,7 @@ const useCustomerStore = create((set) => ({
         contactPerson: "",
         deliveryDate: "",
         remarks: "",
+        attachment: null,
       },
     }),
 }));

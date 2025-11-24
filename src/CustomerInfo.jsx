@@ -5,13 +5,23 @@ export default function CustomerInfo() {
   const { customerInfo, setCustomerInfo } = useCustomerStore();
   const navigate = useNavigate();
 
+  // Check all fields are filled (attachment included)
   const allFilled =
     customerInfo.storeName &&
     customerInfo.location &&
     customerInfo.customerName &&
     customerInfo.contactPerson &&
-    customerInfo.deliveryDate &&
-    customerInfo.remarks;
+    customerInfo.deliveryDate;
+  // customerInfo.remarks;
+  // customerInfo.attachment; // NEW
+
+  // Handle file upload
+  const handleAttachment = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCustomerInfo("attachment", file);
+    }
+  };
 
   return (
     <section className="p-4">
@@ -67,10 +77,31 @@ export default function CustomerInfo() {
         <legend className="fieldset-legend">REMARKS</legend>
         <textarea
           className="textarea w-full"
-          placeholder="Bio"
+          placeholder="Details / Notes"
           value={customerInfo.remarks}
           onChange={(e) => setCustomerInfo("remarks", e.target.value)}
-        ></textarea>
+        />
+
+        {/* NEW ATTACHMENT FIELD */}
+        <legend className="fieldset-legend">ATTACHMENT (Picture)</legend>
+        <input
+          type="file"
+          accept="image/*"
+          className="file-input w-full"
+          onChange={handleAttachment}
+        />
+
+        {/* Preview image if exists */}
+        {customerInfo.attachment && (
+          <div className="mt-3">
+            <p className="font-medium mb-1">Preview:</p>
+            <img
+              src={URL.createObjectURL(customerInfo.attachment)}
+              className="rounded border max-w-xs"
+              alt="Attachment preview"
+            />
+          </div>
+        )}
 
         <button
           className="btn btn-secondary my-4 w-full"

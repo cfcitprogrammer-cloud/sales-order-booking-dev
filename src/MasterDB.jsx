@@ -89,6 +89,14 @@ export default function MasterDB() {
                       : "N/A"}
                   </p>
 
+                  <div>
+                    {order.attachment ? (
+                      <img src={order.attachment} alt="image" className="" />
+                    ) : (
+                      ""
+                    )}
+                  </div>
+
                   <div className="space-y-1 mb-3">
                     <p>
                       <strong>Store:</strong> {order.store_name}

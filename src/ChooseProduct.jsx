@@ -1,13 +1,17 @@
 import { useState } from "react";
 import useCartStore from "./stores/cartStore"; // Import the zustand store
 import products from "./data/products-new.json"; // Your product list
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function ChooseProduct() {
+  const navigate = useNavigate();
   const addToCart = useCartStore((state) => state.addToCart);
+  const removeFromCart = useCartStore((state) => state.removeFromCart);
   const cart = useCartStore((state) => state.cart); // Get the current cart
+
   const [qty, setQty] = useState({});
-  const [option, setOption] = useState({}); // "pack" or "case" per product
+  const [option, setOption] = useState({});
+  const [openCartModal, setOpenCartModal] = useState(false);
 
   // Generate a unique ID for each product
   const productList = products.map((p, i) => ({
@@ -36,7 +40,7 @@ export default function ChooseProduct() {
     addToCart({
       id: product.uid,
       item: product.item,
-      option: selectedOption, // "pack" or "case"
+      option: selectedOption,
       qty: Number(quantity),
       packPrice: product.packPrize,
       casePrice: product.casePrice,
@@ -48,12 +52,25 @@ export default function ChooseProduct() {
   return (
     <section className="p-4">
       <div className="grid grid-cols-4 gap-4 max-w-[1000px] mx-auto">
-        <div className="col-span-4">
-          <Link to="/checkout" className="btn btn-secondary my-4">
+        <div className="col-span-4 flex gap-4 my-4">
+          <button className="btn btn-outline" onClick={() => navigate(-1)}>
+            ⬅ Back
+          </button>
+
+          <Link to="/checkout" className="btn btn-secondary">
             Proceed to Checkout
           </Link>
+
+          {/* View Cart Button */}
+          <button
+            className="btn btn-accent"
+            onClick={() => setOpenCartModal(true)}
+          >
+            View Cart ({cart.length})
+          </button>
         </div>
 
+        {/* PRODUCT LIST */}
         {productList.map((product) => {
           const selectedOption = option[product.uid] || "pack";
 
@@ -64,6 +81,7 @@ export default function ChooseProduct() {
                 className="w-full"
                 allow="autoplay"
               ></iframe>
+
               <h1 className="font-semibold mt-2">{product.item}</h1>
 
               <p className="text-sm text-gray-600">
@@ -112,6 +130,48 @@ export default function ChooseProduct() {
             </div>
           );
         })}
+
+        {/* CART MODAL */}
+        {openCartModal && (
+          <dialog className="modal modal-open">
+            <div className="modal-box">
+              <h3 className="font-bold text-lg mb-4">Cart Items</h3>
+
+              {cart.length === 0 ? (
+                <p className="text-gray-500">Your cart is empty.</p>
+              ) : (
+                <ul className="space-y-3">
+                  {cart.map((item) => (
+                    <li
+                      key={item.id + item.option}
+                      className="flex justify-between items-center border p-2 rounded"
+                    >
+                      <div>
+                        <p className="font-semibold">{item.item}</p>
+                        <p className="text-sm text-gray-600">
+                          {item.option.toUpperCase()} × {item.qty}
+                        </p>
+                      </div>
+
+                      <button
+                        className="btn btn-error btn-sm"
+                        onClick={() => removeFromCart(item.id, item.option)}
+                      >
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <div className="modal-action">
+                <button className="btn" onClick={() => setOpenCartModal(false)}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </dialog>
+        )}
       </div>
     </section>
   );

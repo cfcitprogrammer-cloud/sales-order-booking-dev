@@ -2,6 +2,7 @@ import useCustomerStore from "./stores/customerStore";
 import useCartStore from "./stores/cartStore";
 import { supabase } from "./supabase";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function Checkout() {
   const customerInfo = useCustomerStore((state) => state.customerInfo);
@@ -12,6 +13,31 @@ export default function Checkout() {
 
   const navigate = useNavigate();
 
+  const [isLoading, setIsLoading] = useState(false);
+
+  // -------------------------------------------------
+  // UPLOAD IMAGE TO SUPABASE STORAGE
+  // -------------------------------------------------
+  async function uploadImage(file) {
+    if (!file) return null;
+
+    const ext = file.name.split(".").pop();
+    const fileName = `${Date.now()}.${ext}`;
+    const filePath = `attachments/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("sbof")
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error("Image upload failed:", uploadError);
+      return null;
+    }
+
+    const { data } = supabase.storage.from("sbof").getPublicUrl(filePath);
+    return data.publicUrl;
+  }
+
   // -------------------------------------------------
   // GOOGLE FORM SUBMIT FUNCTION
   // -------------------------------------------------
@@ -20,63 +46,81 @@ export default function Checkout() {
       "https://docs.google.com/forms/d/e/1FAIpQLSd-j52TasgiUIA3eFpFvibQn0LlbTHVgv-kQlOkTkZ1mGxTGg/formResponse";
 
     const form = new FormData();
-    form.append("entry.1223351316", orderId); // Order ID field in Google Form
+    form.append("entry.1223351316", orderId);
 
     await fetch(formURL, {
       method: "POST",
-      mode: "no-cors", // required due to Google Forms CORS restrictions
+      mode: "no-cors",
       body: form,
     });
-
-    console.log("Google Form submitted with Order ID:", orderId);
   }
 
   // -------------------------------------------------
-  // CONFIRM ORDER (SUPABASE + GOOGLE FORM + REDIRECT)
+  // CALCULATE GRAND TOTAL
+  // -------------------------------------------------
+  const grandTotal = cart.reduce((total, item) => {
+    const price =
+      item.option === "pack" ? Number(item.packPrice) : Number(item.casePrice);
+    return total + price * item.qty;
+  }, 0);
+
+  // -------------------------------------------------
+  // CONFIRM ORDER
   // -------------------------------------------------
   async function handleConfirm() {
-    const customerInfoData = useCustomerStore.getState().customerInfo;
+    if (isLoading) return;
+    setIsLoading(true);
 
-    // Insert into Supabase
+    const info = useCustomerStore.getState().customerInfo;
+
+    // Upload attachment if exists
+    const imageUrl = await uploadImage(info.attachment);
+
+    // Insert into Supabase DB
     const { data, error } = await supabase
       .from("customer_data")
       .insert([
         {
-          store_name: customerInfoData.storeName,
-          location: customerInfoData.location,
-          customer_name: customerInfoData.customerName,
-          contact_person: customerInfoData.contactPerson,
-          delivery_date: customerInfoData.deliveryDate,
-          remarks: customerInfoData.remarks,
+          store_name: info.storeName,
+          location: info.location,
+          customer_name: info.customerName,
+          contact_person: info.contactPerson,
+          delivery_date: info.deliveryDate,
+          remarks: info.remarks,
+          attachment: imageUrl,
           orders: JSON.stringify(cart),
         },
       ])
-      .select(); // ensures we get the inserted row back
+      .select();
 
     if (error) {
       console.error("Error inserting data:", error);
       alert("Something went wrong.");
+      setIsLoading(false);
       return;
     }
 
-    // Get inserted ID
     const insertedId = data[0].id;
-    console.log("Inserted ID:", insertedId);
 
-    // 1️⃣ Submit the ID to Google Form
+    // Submit ID to Google Form
     await submitGoogleForm(insertedId);
 
-    // 2️⃣ Clear Zustand stores
+    // Clear Zustand stores
     clearCart();
     clearCustomer();
 
-    // 3️⃣ Navigate to success page
+    // Redirect
     navigate("/done");
   }
 
   return (
     <section className="p-4">
       <div className="max-w-[1000px] mx-auto">
+        {/* BACK BUTTON */}
+        <button className="btn btn-outline mb-4" onClick={() => navigate(-1)}>
+          ⬅ Back
+        </button>
+
         <h1 className="text-3xl font-bold mb-4">Checkout</h1>
 
         {/* CUSTOMER INFO */}
@@ -101,6 +145,17 @@ export default function Checkout() {
           <div>
             <strong>Remarks:</strong> {customerInfo.remarks}
           </div>
+
+          {customerInfo.attachment && (
+            <div className="mt-3">
+              <strong>Attachment:</strong>
+              <img
+                src={URL.createObjectURL(customerInfo.attachment)}
+                alt="Attachment Preview"
+                className="w-40 h-40 object-cover border mt-2"
+              />
+            </div>
+          )}
         </div>
 
         {/* CART ITEMS */}
@@ -113,18 +168,48 @@ export default function Checkout() {
             <div className="space-y-2">
               {cart.map((item, index) => (
                 <div key={index} className="flex justify-between border-b pb-2">
-                  <span>{item.item}</span>
-                  <span>Qty: {item.qty}</span>
+                  <div>
+                    {item.item} ({item.option})
+                  </div>
+                  <div>
+                    {item.qty} × ₱
+                    {item.option === "pack"
+                      ? Number(item.packPrice).toFixed(2)
+                      : Number(item.casePrice).toFixed(2)}
+                  </div>
                 </div>
               ))}
             </div>
           )}
+
+          {/* GRAND TOTAL */}
+          <div className="flex justify-between font-semibold text-lg mt-4">
+            <span>Grand Total:</span>
+            <span>₱{grandTotal.toFixed(2)}</span>
+          </div>
         </div>
 
         {/* CONFIRM ORDER */}
-        <button onClick={handleConfirm} className="btn btn-primary w-full">
-          Confirm Order
+        <button
+          onClick={handleConfirm}
+          className="btn btn-primary w-full flex items-center justify-center gap-2"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <span className="loading loading-spinner loading-sm"></span>
+              Submitting...
+            </>
+          ) : (
+            "Confirm Order"
+          )}
         </button>
+
+        {isLoading && (
+          <p className="text-center text-gray-500 mt-2">
+            Please wait while we process your order...
+          </p>
+        )}
       </div>
     </section>
   );
