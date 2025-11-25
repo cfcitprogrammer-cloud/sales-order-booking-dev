@@ -15,11 +15,15 @@ export default function Welcome() {
 
   return (
     <section className="p-4">
-      <div className="max-w-[1000px] mx-auto bg-primary text-white p-60 text-center rounded-lg">
+      <div className="max-w-[1000px] mx-auto bg-primary text-white px-4 py-60 text-center rounded-lg">
         <h1 className="text-4xl font-semibold">Sales Order Booking System</h1>
         <p>Press the button below to get started.</p>
         <Link to={"/customer-info"} className="btn btn-secondary my-4">
           Get Started
+        </Link>
+        <br />
+        <Link to={"/master/db"} className="btn bg-orange-400 my-4">
+          View Master DB
         </Link>
       </div>
     </section>

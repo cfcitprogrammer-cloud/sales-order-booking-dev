@@ -47,23 +47,28 @@ export default function ChooseProduct() {
       packSize: product.packsize,
       packing: product.packing,
     });
+
+    alert("Added to cart!");
   };
 
   return (
     <section className="p-4">
-      <div className="grid grid-cols-4 gap-4 max-w-[1000px] mx-auto">
-        <div className="col-span-4 flex gap-4 my-4">
-          <button className="btn btn-outline" onClick={() => navigate(-1)}>
+      <div className="max-w-screen-xl mx-auto">
+        <div className="flex flex-wrap gap-4 my-4">
+          <button
+            className="btn btn-outline w-full sm:w-auto"
+            onClick={() => navigate(-1)}
+          >
             ⬅ Back
           </button>
 
-          <Link to="/checkout" className="btn btn-secondary">
+          <Link to="/checkout" className="btn btn-secondary w-full sm:w-auto">
             Proceed to Checkout
           </Link>
 
           {/* View Cart Button */}
           <button
-            className="btn btn-accent"
+            className="btn btn-accent w-full sm:w-auto"
             onClick={() => setOpenCartModal(true)}
           >
             View Cart ({cart.length})
@@ -71,65 +76,70 @@ export default function ChooseProduct() {
         </div>
 
         {/* PRODUCT LIST */}
-        {productList.map((product) => {
-          const selectedOption = option[product.uid] || "pack";
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {productList.map((product) => {
+            const selectedOption = option[product.uid] || "pack";
 
-          return (
-            <div key={product.uid} className="p-2 border rounded">
-              {/* <iframe
-                src={`https://drive.google.com/file/d/${product.id}/preview`}
-                className="w-full"
-                allow="autoplay"
-              ></iframe> */}
+            return (
+              <div
+                key={product.uid}
+                className="p-4 border rounded-lg shadow-sm"
+              >
+                <iframe
+                  src={`https://drive.google.com/file/d/${product.id}/preview`}
+                  className="w-full h-64"
+                  allow="autoplay"
+                ></iframe>
 
-              <h1 className="font-semibold mt-2">{product.item}</h1>
+                <h1 className="font-semibold mt-2">{product.item}</h1>
 
-              <p className="text-sm text-gray-600">
-                Pack: {product.packing} pcs | Size: {product.packsize}
-              </p>
-              <p className="text-sm">Pack Price: ₱{product.packPrize}</p>
-              <p className="text-sm">Case Price: ₱{product.casePrice}</p>
+                <p className="text-sm text-gray-600">
+                  Pack: {product.packing} pcs | Size: {product.packsize}
+                </p>
+                <p className="text-sm">Pack Price: ₱{product.packPrize}</p>
+                <p className="text-sm">Case Price: ₱{product.casePrice}</p>
 
-              <div className="mt-2 flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span>Buy:</span>
-                  <select
-                    className="select select-sm"
-                    value={selectedOption}
-                    onChange={(e) =>
-                      handleOptionChange(product.uid, e.target.value)
-                    }
-                  >
-                    <option value="pack">Pack</option>
-                    <option value="case">Case</option>
-                  </select>
-                </div>
-
-                {selectedOption === "pack" && (
+                <div className="mt-2 flex flex-col gap-2">
                   <div className="flex items-center gap-2">
-                    <span>QTY:</span>
-                    <input
-                      type="number"
-                      min="1"
-                      className="input input-sm w-20"
-                      value={qty[product.uid] || 1}
+                    <span>Buy:</span>
+                    <select
+                      className="select select-sm"
+                      value={selectedOption}
                       onChange={(e) =>
-                        handleQtyChange(product.uid, e.target.value)
+                        handleOptionChange(product.uid, e.target.value)
                       }
-                    />
+                    >
+                      <option value="pack">Pack</option>
+                      <option value="case">Case</option>
+                    </select>
                   </div>
-                )}
 
-                <button
-                  className="btn btn-primary btn-sm mt-2"
-                  onClick={() => handleAdd(product)}
-                >
-                  ADD
-                </button>
+                  {selectedOption === "pack" && (
+                    <div className="flex items-center gap-2">
+                      <span>QTY:</span>
+                      <input
+                        type="number"
+                        min="1"
+                        className="input input-sm w-20"
+                        value={qty[product.uid] || 1}
+                        onChange={(e) =>
+                          handleQtyChange(product.uid, e.target.value)
+                        }
+                      />
+                    </div>
+                  )}
+
+                  <button
+                    className="btn btn-primary btn-sm mt-2"
+                    onClick={() => handleAdd(product)}
+                  >
+                    ADD
+                  </button>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
 
         {/* CART MODAL */}
         {openCartModal && (
