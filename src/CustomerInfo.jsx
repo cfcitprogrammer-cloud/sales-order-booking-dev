@@ -11,7 +11,8 @@ export default function CustomerInfo() {
     customerInfo.location &&
     customerInfo.customerName &&
     customerInfo.contactPerson &&
-    customerInfo.deliveryDate;
+    customerInfo.deliveryDate &&
+    customerInfo.receivingDate;
   // customerInfo.remarks;
   // customerInfo.attachment; // NEW
 
@@ -72,6 +73,15 @@ export default function CustomerInfo() {
           className="input w-full"
           value={customerInfo.deliveryDate}
           onChange={(e) => setCustomerInfo("deliveryDate", e.target.value)}
+        />
+
+        <legend className="fieldset-legend">RECEIVING TIME</legend>
+        <input
+          type="time"
+          className="input w-full"
+          placeholder="Type here"
+          value={customerInfo.receivingTime}
+          onChange={(e) => setCustomerInfo("receivingTime", e.target.value)}
         />
 
         <legend className="fieldset-legend">REMARKS</legend>

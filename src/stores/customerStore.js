@@ -7,6 +7,7 @@ const useCustomerStore = create((set) => ({
     customerName: "",
     contactPerson: "",
     deliveryDate: "",
+    receivingTime: "",
     remarks: "",
     attachment: null, // NEW
   },
@@ -27,6 +28,7 @@ const useCustomerStore = create((set) => ({
         customerName: "",
         contactPerson: "",
         deliveryDate: "",
+        receivingTime: "",
         remarks: "",
         attachment: null,
       },

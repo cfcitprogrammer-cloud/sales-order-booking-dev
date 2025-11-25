@@ -35,7 +35,7 @@ export default function ChooseProduct() {
 
   const handleAdd = (product) => {
     const selectedOption = option[product.uid] || "pack";
-    const quantity = qty[product.uid];
+    const quantity = qty[product.uid] ? qty[product.uid] : 1;
 
     addToCart({
       id: product.uid,

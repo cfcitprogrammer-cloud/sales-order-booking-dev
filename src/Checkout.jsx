@@ -143,6 +143,9 @@ export default function Checkout() {
             <strong>Delivery Date:</strong> {customerInfo.deliveryDate}
           </div>
           <div>
+            <strong>Receiving Time:</strong> {customerInfo.receivingTime}
+          </div>
+          <div>
             <strong>Remarks:</strong> {customerInfo.remarks}
           </div>
 
