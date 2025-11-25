@@ -1,5 +1,6 @@
 import useCustomerStore from "./stores/customerStore";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function CustomerInfo() {
   const { customerInfo, setCustomerInfo } = useCustomerStore();
@@ -27,9 +28,13 @@ export default function CustomerInfo() {
   return (
     <section className="p-4">
       <div className="my-4 max-w-[1000px] mx-auto">
-        <h1 className="text-2xl font-semibold mb-4">
-          Enter Customer Information
-        </h1>
+        <header>
+          <Link to="/" className="btn btn-primary px-2 py-1 mr-4 mb-4">
+            ⬅ Back to Home
+          </Link>
+          <h1 className="text-2xl font-semibold">Customer Information</h1>
+          <p>Please enter the necessary customer data.</p>
+        </header>
 
         <legend className="fieldset-legend">STORE NAME</legend>
         <input
