@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "./supabase";
+import { convertTo12HourFormat } from "./utils/time";
 
 export default function OrderDetails() {
   const { id } = useParams();
@@ -107,16 +108,8 @@ export default function OrderDetails() {
               <strong>Delivery Date:</strong> {order.delivery_date}
             </p>
             <p>
-              <strong>Receiving Time:</strong>{" "}
-              {order.receiving_time
-                ? new Date(
-                    `2025-12-05T${order.receiving_time}Z`
-                  ).toLocaleString("en-US", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true,
-                  })
-                : "N/A"}
+              <strong>Receiving Time:</strong> {order.receiving_time}
+              {convertTo12HourFormat(order.receiving_time)}
             </p>
             <p>
               <strong>Remarks:</strong> {order.remarks}
@@ -137,6 +130,7 @@ export default function OrderDetails() {
                 <div className="flex-1">Item</div>
                 <div className="w-20 text-center">Option</div>
                 <div className="w-20 text-center">Qty</div>
+                <div className="w-20 text-center">Price</div>
                 <div className="w-24 text-right">Total</div>
               </div>
 
@@ -156,6 +150,10 @@ export default function OrderDetails() {
                       <div className="flex-1">{p.item}</div>
                       <div className="w-20 text-center">{p.option}</div>
                       <div className="w-20 text-center">{p.qty}</div>
+                      <div className="w-20 text-center">
+                        {p.option === "pack" ? p.packPrice : p.casePrice}
+                      </div>
+
                       <div className="w-24 text-right">₱{total.toFixed(2)}</div>
                     </div>
                   );

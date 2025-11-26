@@ -1,5 +1,5 @@
 // CustomerInfoModal.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useCustomerStore from "./stores/customerStore"; // Assuming you have a Zustand store for customer info
 import { useNavigate } from "react-router-dom";
 
@@ -15,6 +15,10 @@ export default function CustomerInfoModal({ isOpen, onClose }) {
     customerInfo.contactPerson &&
     customerInfo.deliveryDate &&
     customerInfo.receivingTime;
+
+  useEffect(() => {
+    console.log(customerInfo);
+  }, [customerInfo]);
 
   // Handle file upload
   const handleAttachment = (e) => {

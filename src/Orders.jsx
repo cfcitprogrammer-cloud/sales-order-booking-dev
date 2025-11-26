@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "./supabase";
 import { useNavigate } from "react-router-dom";
 import SkeletonLoading from "./SkeletonLoading";
+import { convertTo12HourFormat } from "./utils/time";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
@@ -114,18 +115,7 @@ export default function Orders() {
                           {new Date(order.delivery_date).toLocaleDateString()}
                         </td>
                         {/* Display Delivery Date */}
-                        <td>
-                          {order.receiving_time
-                            ? new Date(order.receiving_time).toLocaleString(
-                                "en-US",
-                                {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                  hour12: true,
-                                }
-                              )
-                            : "N/A"}
-                        </td>
+                        <td>{convertTo12HourFormat(order.receiving_time)}</td>
                         <td>{new Date(order.created_at).toLocaleString()}</td>
                         <td>
                           <span
@@ -226,16 +216,7 @@ export default function Orders() {
                     </p>
                     <p>
                       <strong>Receiving Time:</strong>{" "}
-                      {order.receiving_time
-                        ? new Date(order.receiving_time).toLocaleString(
-                            "en-US",
-                            {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              hour12: true,
-                            }
-                          )
-                        : "N/A"}
+                      {convertTo12HourFormat(order.receiving_time)}
                     </p>
                     <p>
                       <strong>Remarks:</strong>
