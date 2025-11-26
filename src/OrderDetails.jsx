@@ -131,7 +131,7 @@ export default function OrderDetails() {
             <p>
               <strong>Remarks:</strong> {order.remarks}
             </p>
-            <img src={order.attachment} alt="img" />
+            {order.attachment && <img src={order.attachment} alt="img" />}
           </div>
         </div>
 
