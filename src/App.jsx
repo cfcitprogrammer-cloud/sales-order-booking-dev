@@ -3,7 +3,7 @@ import Dashboard from "./Dashboard";
 
 function App() {
   return (
-    <BrowserRouter basename="/sales-order-booking">
+    <BrowserRouter basename="/sales-order-booking-dev">
       <Dashboard />
     </BrowserRouter>
   );
