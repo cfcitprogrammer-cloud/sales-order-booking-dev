@@ -14,6 +14,8 @@ import Products from "./Products";
 import Checkout from "./Checkout";
 import { Link, Routes, Route, Navigate } from "react-router-dom";
 import Done from "./Done";
+import Orders from "./Orders";
+import OrderDetails from "./OrderDetails";
 
 export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -100,6 +102,8 @@ export default function Dashboard() {
           <Route path="/products" element={<Products />} />
           <Route path="/products/checkout" element={<Checkout />} />
           <Route path="/products/done" element={<Done />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/master/db/:id" element={<OrderDetails />} />
 
           {/* Catch-all route for invalid paths */}
           <Route path="*" element={<Navigate to="/products" replace />} />
