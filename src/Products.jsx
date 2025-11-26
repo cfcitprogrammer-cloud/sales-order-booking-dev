@@ -68,34 +68,39 @@ export default function Products() {
     <section className="px-4">
       <div className="max-w-screen-xl mx-auto space-y-4">
         <div className="sticky top-0 bg-white py-4 z-4 border-b border-gray-200 space-y-4">
-          <header>
-            <h1 className="text-2xl font-semibold">Products</h1>
-            <p>Browse and manage the products available for sale.</p>
-          </header>
+          <div
+            tabIndex={0}
+            className={`collapse collapse-sm collapse-arrow bg-base-100 border-base-300 border`}
+          >
+            <div className="collapse-title font-semibold">
+              <h1 className="text-2xl font-semibold">Products</h1>
+            </div>
+            <div className="collapse-content text-sm">
+              <div>
+                <input
+                  type="text"
+                  className="input input-sm w-full"
+                  placeholder="Search Product Title"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)} // Update search query
+                />
 
-          <div>
-            <input
-              type="text"
-              className="input input-sm w-full"
-              placeholder="Search Product Title"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)} // Update search query
-            />
-
-            {/* View Cart Button */}
-            <div className="mt-4 flex flex-wrap gap-4 justify-start">
-              <button
-                className="btn btn-secondary w-full sm:w-auto"
-                onClick={() => setIsCustomerModalOpen(true)} // Open the customer modal on click
-              >
-                Proceed to Checkout
-              </button>
-              <button
-                className="btn btn-accent w-full sm:w-auto"
-                onClick={() => setOpenCartModal(true)} // Open cart modal
-              >
-                View Cart ({cart.length})
-              </button>
+                {/* View Cart Button */}
+                <div className="mt-4 flex flex-wrap gap-4 justify-start">
+                  <button
+                    className="btn btn-secondary w-full sm:w-auto"
+                    onClick={() => setIsCustomerModalOpen(true)} // Open the customer modal on click
+                  >
+                    Proceed to Checkout
+                  </button>
+                  <button
+                    className="btn btn-accent w-full sm:w-auto"
+                    onClick={() => setOpenCartModal(true)} // Open cart modal
+                  >
+                    View Cart ({cart.length})
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -146,8 +151,9 @@ export default function Products() {
                         <input
                           type="number"
                           min="1"
+                          defaultValue={"1"}
                           className="input input-sm w-20"
-                          value={qty[product.uid] || 1}
+                          value={qty[product.uid]}
                           onChange={(e) =>
                             handleQtyChange(product.uid, e.target.value)
                           }

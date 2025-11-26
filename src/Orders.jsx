@@ -219,7 +219,7 @@ export default function Orders() {
                       {convertTo12HourFormat(order.receiving_time)}
                     </p>
                     <p>
-                      <strong>Remarks:</strong>
+                      <strong>Remarks: </strong>
                       {order.remarks || "None"}
                     </p>
 

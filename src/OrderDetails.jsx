@@ -9,6 +9,7 @@ export default function OrderDetails() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
+  const [showCancelPrompt, setShowCancelPrompt] = useState(false);
 
   useEffect(() => {
     async function loadOrder() {
@@ -53,6 +54,22 @@ export default function OrderDetails() {
     else if (p.option === "case") return acc + p.qty * p.casePrice;
     return acc;
   }, 0);
+
+  // Cancel order function
+  async function handleCancelOrder() {
+    const { error } = await supabase
+      .from("customer_data")
+      .update({ status: "CANCELLED" })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error canceling order:", error);
+      setErrorMsg("Failed to cancel order.");
+    } else {
+      setOrder((prevOrder) => ({ ...prevOrder, status: "CANCELLED" }));
+      setShowCancelPrompt(false);
+    }
+  }
 
   return (
     <section className="p-4">
@@ -114,8 +131,46 @@ export default function OrderDetails() {
             <p>
               <strong>Remarks:</strong> {order.remarks}
             </p>
+            <img src={order.attachment} alt="img" />
           </div>
         </div>
+
+        {/* Cancel Order Button */}
+        {order.status === "PENDING" && (
+          <button
+            onClick={() => setShowCancelPrompt(true)}
+            className="mb-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+          >
+            Cancel Order
+          </button>
+        )}
+
+        {/* Confirmation Prompt */}
+        {showCancelPrompt && (
+          <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+            <div className="bg-white p-6 rounded shadow-lg text-center">
+              <h3 className="text-lg font-semibold mb-4">
+                Are you sure you want to cancel this order?
+              </h3>
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={() => {
+                    setShowCancelPrompt(false);
+                  }}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                >
+                  No
+                </button>
+                <button
+                  onClick={handleCancelOrder}
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  Yes
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Products List */}
         <div>

@@ -3,12 +3,14 @@ import useCartStore from "./stores/cartStore";
 import { supabase } from "./supabase";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { convertTo12HourFormat } from "./utils/time";
 
 export default function Checkout() {
   const customerInfo = useCustomerStore((state) => state.customerInfo);
   const clearCustomer = useCustomerStore((state) => state.clearCustomerInfo);
 
   const cart = useCartStore((state) => state.cart);
+  const updateCart = useCartStore((state) => state.updateCart);
   const clearCart = useCartStore((state) => state.clearCart);
 
   const navigate = useNavigate();
@@ -63,6 +65,32 @@ export default function Checkout() {
       item.option === "pack" ? Number(item.packPrice) : Number(item.casePrice);
     return total + price * item.qty;
   }, 0);
+
+  // -------------------------------------------------
+  // HANDLE UNIT PRICE CHANGE
+  // -------------------------------------------------
+  function handlePriceChange(index, newPrice) {
+    const updatedCart = [...cart];
+    const item = updatedCart[index];
+
+    if (newPrice === "") {
+      // Allow clearing the value (empty)
+      if (item.option === "pack") {
+        item.packPrice = null; // Set to null or leave empty
+      } else {
+        item.casePrice = null;
+      }
+    } else if (!isNaN(newPrice) && newPrice >= 0) {
+      // Only update if the new price is a valid number
+      if (item.option === "pack") {
+        item.packPrice = newPrice;
+      } else {
+        item.casePrice = newPrice;
+      }
+    }
+
+    updateCart(updatedCart); // Update the cart with the modified price
+  }
 
   // -------------------------------------------------
   // CONFIRM ORDER
@@ -144,7 +172,8 @@ export default function Checkout() {
             <strong>Delivery Date:</strong> {customerInfo.deliveryDate}
           </div>
           <div>
-            <strong>Receiving Time:</strong> {customerInfo.receivingTime}
+            <strong>Receiving Time:</strong>{" "}
+            {convertTo12HourFormat(customerInfo.receivingTime)}
           </div>
           <div>
             <strong>Remarks:</strong> {customerInfo.remarks}
@@ -170,19 +199,41 @@ export default function Checkout() {
             <div>No items added.</div>
           ) : (
             <div className="space-y-2">
-              {cart.map((item, index) => (
-                <div key={index} className="flex justify-between border-b pb-2">
-                  <div>
-                    {item.item} ({item.option})
+              {cart.map((item, index) => {
+                // Calculate the total price per item
+                const price =
+                  item.option === "pack"
+                    ? Number(item.packPrice)
+                    : Number(item.casePrice);
+                const totalPrice = price * item.qty;
+
+                return (
+                  <div
+                    key={index}
+                    className="flex justify-between border-b pb-2"
+                  >
+                    <div>
+                      {item.item} ({item.option})
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {item.qty} × ₱
+                      <input
+                        className="w-20"
+                        type="number"
+                        value={
+                          item.option === "pack"
+                            ? item.packPrice
+                            : item.casePrice || ""
+                        }
+                        onChange={(e) =>
+                          handlePriceChange(index, e.target.value)
+                        }
+                      />{" "}
+                      = ₱{totalPrice.toFixed(2)}
+                    </div>
                   </div>
-                  <div>
-                    {item.qty} × ₱
-                    {item.option === "pack"
-                      ? Number(item.packPrice).toFixed(2)
-                      : Number(item.casePrice).toFixed(2)}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 

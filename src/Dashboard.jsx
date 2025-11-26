@@ -5,8 +5,6 @@ import {
   Package,
   PanelLeftClose,
   PanelLeftOpen,
-  PanelRight,
-  PanelRightOpen,
   ReceiptText,
 } from "lucide-react";
 import { useState } from "react";
@@ -20,8 +18,16 @@ import OrderDetails from "./OrderDetails";
 export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // Toggle sidebar
   function toggleAside() {
     setIsSidebarOpen(!isSidebarOpen);
+  }
+
+  // Close sidebar when a link is clicked
+  function handleLinkClick() {
+    if (isSidebarOpen) {
+      toggleAside();
+    }
   }
 
   return (
@@ -53,6 +59,7 @@ export default function Dashboard() {
 
           <Link
             to="/products"
+            onClick={handleLinkClick} // Close sidebar when clicked
             className="btn btn-ghost w-full justify-start items-center rounded-none font-normal"
           >
             <Box size={16} className="mr-2" />
@@ -60,6 +67,7 @@ export default function Dashboard() {
           </Link>
           <Link
             to="/orders"
+            onClick={handleLinkClick} // Close sidebar when clicked
             className="btn btn-ghost w-full justify-start rounded-none font-normal"
           >
             <ReceiptText size={16} className="mr-2" />
@@ -67,6 +75,7 @@ export default function Dashboard() {
           </Link>
           <Link
             to="/analytics"
+            onClick={handleLinkClick} // Close sidebar when clicked
             className="btn btn-ghost w-full justify-start rounded-none font-normal"
           >
             <ChartSpline size={16} className="mr-2" />
